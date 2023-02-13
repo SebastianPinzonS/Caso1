@@ -11,6 +11,7 @@ public class LimitedBuffer {
 	public synchronized void addToBuffer(Message element, boolean isOrange) {
 		if(isOrange) {
 			while (!bufferQueue.queuePut(element)) {
+				Thread.yield();
 			}
 		} else {
 			while (!bufferQueue.queuePut(element)){ //Revisa si hay suficiente espacio en el buffer para agregar nuevos elementos
@@ -29,6 +30,7 @@ public class LimitedBuffer {
 		if(isOrange) {
 			Message element = bufferQueue.queueGet();
 			while (element == null) {
+				Thread.yield();
 				element = bufferQueue.queueGet();
 			}
 			notifyAll();
