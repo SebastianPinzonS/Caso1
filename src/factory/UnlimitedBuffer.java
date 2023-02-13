@@ -1,15 +1,15 @@
 package factory;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public class UnlimitedBuffer {
 
-	private static ConcurrentHashMap<Integer, Message> bufferMap= new ConcurrentHashMap<Integer, Message>();
+	private static HashMap<Integer, Message> bufferMap= new HashMap<Integer, Message>();
 	private static int currentId = 0;
 
 
 
-	public void addToBuffer(Message element) {
+	public synchronized void addToBuffer(Message element) {
 		bufferMap.put(element.getId(), element);
 		notify();
 	}
