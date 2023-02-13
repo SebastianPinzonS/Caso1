@@ -1,40 +1,27 @@
 package factory;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UnlimitedBuffer {
-	
-	private static int buffer = 0;
-	private static Queue<Product> bufferQueue = new LinkedList<Product>();
+
+	private static ConcurrentHashMap<Integer, Message> bufferMap= new ConcurrentHashMap<Integer, Message>();
 	private static int currentId = 0;
 
 
 
-	public synchronized void addToBuffer(Product element) {
-		bufferQueue.offer(element);
-		buffer++;
+	public void addToBuffer(Message element) {
+		bufferMap.put(element.getId(), element);
 		notify();
 	}
 	
-	public synchronized Product exctractFromBuffer(){
-		if (buffer < 1){
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public synchronized Message exctractFromBuffer(){
+		boolean exit = false;
+		while (!exit){
+			bufferMap.containsKey(currentId);
 		}
+		Message value = bufferMap.get(currentId);
+		currentId++;
+		return value;
 		
-		Product element = bufferQueue.poll();
-		if (element.getId() != currentId) {
-			bufferQueue.offer(element);
-		} else {
-			currentId++;
-			buffer--;
-			return element;
-		}
-		
-		return null;
 	}
 }
