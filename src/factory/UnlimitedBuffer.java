@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 public class UnlimitedBuffer {
 
-	private static HashMap<Integer, Message> bufferMap= new HashMap<Integer, Message>();
-	private static int currentId = 0;
+	public static HashMap<Integer, Message> bufferMap= new HashMap<Integer, Message>();
+	public static int currentId = 0;
 
 
 
@@ -17,11 +17,14 @@ public class UnlimitedBuffer {
 	public synchronized Message exctractFromBuffer(){
 		boolean exit = false;
 		while (!exit){
-			bufferMap.containsKey(currentId);
+			exit = bufferMap.containsKey(currentId);
 		}
 		Message value = bufferMap.get(currentId);
 		currentId++;
 		return value;
 		
+	}
+	public boolean isEmpty() {
+		return bufferMap.isEmpty();
 	}
 }

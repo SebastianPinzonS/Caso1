@@ -2,30 +2,36 @@ package factory;
 
 public class Message {
 	
-	private IdAssigner idAssigner = new IdAssigner();
 	private int id;
 	private boolean orange;
-	private int stage = 0;
+	public String stage = "";
 	
 	public Message(boolean oOrange) {
 		
-		orange = oOrange;
-		this.id = idAssigner.getId();	
+		this.orange = oOrange;
 	}
 	
 	public int getId() {
 		return this.id;
 	}
 	
+	public void setId(int oId) {
+		this.id = oId;
+	}
+	
 	public boolean isOrange() {
 		return orange;
 	}
 	
-	public void advanceStage() {
-		stage++;
+	public void advanceStage(int stageNum) {
+		if(this.orange) {
+			stage = stage + "La fase " + stageNum + " ha terminado y soy naranja, ";
+		} else {
+		stage = stage + "La fase " + stageNum + " ha terminado, ";
+		}
 	}
 	
-	public int getStage() {
+	public String getStage() {
 		return stage;
 	}
 }

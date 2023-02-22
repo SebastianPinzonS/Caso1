@@ -29,9 +29,20 @@ public class LimitedBuffer {
 	public synchronized Message exctractFromBuffer(boolean isOrange){
 		if(isOrange) {
 			Message element = bufferQueue.queueGet();
-			while (element == null) {
+			while (element == null || !element.isOrange()) {
+				if(element != null) {
+					bufferQueue.queuePut(element);
+				}
 				Thread.yield();
 				element = bufferQueue.queueGet();
+			}
+			if(!element.isOrange()) {
+				bufferQueue.queuePut(element);
+				Thread.yield();
+			}
+			if(!element.isOrange()) {
+				bufferQueue.queuePut(element);
+				Thread.yield();
 			}
 			notifyAll();
 			return element;
