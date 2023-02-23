@@ -15,6 +15,12 @@ public class BufferQueue {
 	
 	public synchronized boolean queuePut(Message value) {
 		if (fill == size) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return false;
 		} else {
 			queue[tail] = value;
@@ -24,12 +30,20 @@ public class BufferQueue {
 				tail++;
 			}
 			fill++;
+			notifyAll();
 			return true;
+
 		}
 	}
 	
 	public synchronized Message queueGet(){
 		if (fill == 0) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return null;
 		} else {
 			Message value = queue[head];
@@ -38,7 +52,8 @@ public class BufferQueue {
 			} else {	
 				head++;
 			}
-			fill++;
+			fill--;
+			notifyAll();
 			return value;
 		}
 	}

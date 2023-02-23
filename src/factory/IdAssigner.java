@@ -2,7 +2,7 @@ package factory;
 
 public class IdAssigner {
 	
-	private static int id = -1;
+	private static int id = 0;
 	
 	public synchronized int getId() {
 		id++;

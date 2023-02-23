@@ -5,16 +5,15 @@ import java.util.HashMap;
 public class UnlimitedBuffer {
 
 	public static HashMap<Integer, Message> bufferMap= new HashMap<Integer, Message>();
-	public static int currentId = 0;
+	public static int currentId = 1;
 
 
 
-	public synchronized void addToBuffer(Message element) {
+	public void addToBuffer(Message element) {
 		bufferMap.put(element.getId(), element);
-		notify();
 	}
 	
-	public synchronized Message exctractFromBuffer(){
+	public synchronized Message extractFromBuffer(){
 		boolean exit = false;
 		while (!exit){
 			exit = bufferMap.containsKey(currentId);

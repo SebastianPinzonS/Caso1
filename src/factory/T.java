@@ -13,12 +13,13 @@ public class T extends Thread {
 	private int stage;
 	private static LimitedBuffer firstBuffer;
 	private static LimitedBuffer secondBuffer;
-	public static UnlimitedBuffer finalBuffer = new UnlimitedBuffer();
+	public static UnlimitedBuffer finalBuffer;
 	private boolean red;
 	private static CyclicBarrier barrier;
-	public static int answerSize = 0;
+	public static int answerSize = 0; 
+	private static final int upperBoundRandom = 500;
+	private static final int lowerBoundRandom = 50;
 
-	
 	
 	public T (boolean oRed, boolean oOrange, int oStage) {
 		this.orange = oOrange; 
@@ -30,7 +31,14 @@ public class T extends Thread {
 		if(stage == 1) {
 			Message m1 = new Message(orange);
 			m1.setId(idAssigner.getId());
-			m1.advanceStage(stage);
+		    int delay = (int)Math.floor(Math.random() * (upperBoundRandom - lowerBoundRandom + 1) + lowerBoundRandom);
+			m1.advanceStage(stage, delay);	
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			firstBuffer.addToBuffer(m1, orange);
 			try {
 				barrier.await();
@@ -42,8 +50,15 @@ public class T extends Thread {
 				e.printStackTrace();
 			}
 		} else if(stage == 2) {
-			Message m2 = firstBuffer.exctractFromBuffer(orange);
-			m2.advanceStage(stage);
+			Message m2 = firstBuffer.extractFromBuffer(orange);
+			int delay = (int)Math.floor(Math.random() * (upperBoundRandom - lowerBoundRandom + 1) + lowerBoundRandom);
+			m2.advanceStage(stage, delay);	
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			secondBuffer.addToBuffer(m2, orange);
 			try {
 				barrier.await();
@@ -55,8 +70,15 @@ public class T extends Thread {
 				e.printStackTrace();
 			}
 		} else if(stage == 3) {
-			Message m3 = secondBuffer.exctractFromBuffer(orange);
-			m3.advanceStage(stage);
+			Message m3 = secondBuffer.extractFromBuffer(orange);
+			int delay = (int)Math.floor(Math.random() * (upperBoundRandom - lowerBoundRandom + 1) + lowerBoundRandom);
+			m3.advanceStage(stage, delay);	
+			try {
+				Thread.sleep(delay);
+			} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}			
 			finalBuffer.addToBuffer(m3);
 			try {
 				barrier.await();
@@ -69,10 +91,8 @@ public class T extends Thread {
 			}
 		} else if(red) {
 			while(answerSize > 0) {
-				Message message = finalBuffer.exctractFromBuffer();
-				if (message == null) {
-					Thread.yield();
-				} else {
+				Message message = finalBuffer.extractFromBuffer();
+				if (message != null) {
 					System.out.println("Salio el mensaje " + message.getId());
 					System.out.println("Su estado es: " + message.getStage());
 					answerSize--;
@@ -109,11 +129,14 @@ public class T extends Thread {
 	    
 	    secondBuffer = new LimitedBuffer(tamano);
 	    
+	    finalBuffer = new UnlimitedBuffer();
+	    
 	    barrier = new CyclicBarrier((3*procesos)+1, ()->System.out.println("El programa termino"));
 	    int bInt = rand.nextInt(procesos);
-	    for(int stage = 1 ; stage < 4; stage++ ) {
-	    	for(int threadNum = 0; threadNum < procesos; threadNum++) {
-	    		T t = new T(false, threadNum == bInt, stage);
+	    
+	    for(int threadNum = 0; threadNum < procesos; threadNum++) {
+	    	for(int stage = 1 ; stage < 4; stage++ ) {
+	    		T t = new T(false, threadNum==bInt, stage);
 	    		t.start();
 	    		
 	    	}

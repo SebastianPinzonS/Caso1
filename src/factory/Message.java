@@ -1,10 +1,12 @@
 package factory;
 
+
 public class Message {
 	
 	private int id;
 	private boolean orange;
 	public String stage = "";
+
 	
 	public Message(boolean oOrange) {
 		
@@ -20,14 +22,14 @@ public class Message {
 	}
 	
 	public boolean isOrange() {
-		return orange;
+		return this.orange;
 	}
 	
-	public void advanceStage(int stageNum) {
+	public void advanceStage(int stageNum, int stageDelay) {
 		if(this.orange) {
-			stage = stage + "La fase " + stageNum + " ha terminado y soy naranja, ";
+			stage = stage + "|La fase " + stageNum + " ha terminado, mi delay fue: " + stageDelay + "ms y soy naranja| ";
 		} else {
-		stage = stage + "La fase " + stageNum + " ha terminado, ";
+		stage = stage + "|La fase " + stageNum + " ha terminado y mi delay fue: "+ stageDelay+ "ms| ";
 		}
 	}
 	
