@@ -16,7 +16,7 @@ public class T extends Thread {
 	public static UnlimitedBuffer finalBuffer;
 	private boolean red;
 	private static CyclicBarrier barrier;
-	public static int answerSize = 0; 
+	public static int answerSize; 
 	private static final int upperBoundRandom = 500;
 	private static final int lowerBoundRandom = 50;
 
@@ -39,7 +39,9 @@ public class T extends Thread {
 					// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			firstBuffer.addToBuffer(m1, orange);
+			while(!firstBuffer.addToBuffer(m1, orange) && orange) {
+				Thread.yield();
+			}
 			try {
 				barrier.await();
 			} catch (InterruptedException e) {
@@ -51,6 +53,10 @@ public class T extends Thread {
 			}
 		} else if(stage == 2) {
 			Message m2 = firstBuffer.extractFromBuffer(orange);
+			while(m2 == null && orange) {
+				Thread.yield();
+				m2 = firstBuffer.extractFromBuffer(orange);
+			}
 			int delay = (int)Math.floor(Math.random() * (upperBoundRandom - lowerBoundRandom + 1) + lowerBoundRandom);
 			m2.advanceStage(stage, delay);	
 			try {
@@ -59,7 +65,9 @@ public class T extends Thread {
 						// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			secondBuffer.addToBuffer(m2, orange);
+			while(!secondBuffer.addToBuffer(m2, orange) && orange) {
+				Thread.yield();
+			}
 			try {
 				barrier.await();
 			} catch (InterruptedException e) {
@@ -71,6 +79,10 @@ public class T extends Thread {
 			}
 		} else if(stage == 3) {
 			Message m3 = secondBuffer.extractFromBuffer(orange);
+			while(m3 == null && orange) {
+				Thread.yield();
+				m3 = secondBuffer.extractFromBuffer(orange);
+			}
 			int delay = (int)Math.floor(Math.random() * (upperBoundRandom - lowerBoundRandom + 1) + lowerBoundRandom);
 			m3.advanceStage(stage, delay);	
 			try {
@@ -78,8 +90,10 @@ public class T extends Thread {
 			} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}			
+			}	
+			
 			finalBuffer.addToBuffer(m3);
+			
 			try {
 				barrier.await();
 			} catch (InterruptedException e) {

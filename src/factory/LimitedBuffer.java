@@ -8,50 +8,37 @@ public class LimitedBuffer {
 		bufferQueue = new BufferQueue(oLimit);
 	}
 	
-	public  void addToBuffer(Message element, boolean isOrange) {
+	public boolean addToBuffer(Message element, boolean isOrange) {
 		if(isOrange) {
-			addToBufferOrange(element);
+			return addToBufferOrange(element);
 		} else {
-			addToBufferNOrange(element);
+			return addToBufferNOrange(element);
 		}
 	}
 	
-	public void addToBufferOrange(Message element) {
-		while(!bufferQueue.queuePut(element)) {
-			Thread.yield();
+	public synchronized boolean addToBufferOrange(Message element) {
+		boolean attempt = bufferQueue.queuePut(element);
+		if (attempt) {
+			notifyAll();
 		}
+		return attempt;
 	}
 	
-	public void addToBufferNOrange(Message element) {
-		while (!bufferQueue.queuePut(element)){ //Revisa si hay suficiente espacio en el buffer para agregar nuevos elementos
-		}
-	}
-
-	
-	public Message extractFromBufferNoOrange(){
-		Message element = bufferQueue.queueGet();
-		while (element == null || element.isOrange()){				//Revisa si hay elementos en el buffer para extraer 
-			if(element != null) {
-				addToBufferNOrange(element);
+	public synchronized boolean addToBufferNOrange(Message element) {
+		while (!bufferQueue.queuePut(element)){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			element = bufferQueue.queueGet();
 		}
-		return element;
+		notifyAll();
+		return true;
 	}
+
 
 	
-	public Message extractFromBufferOrange(){
-		Message element = bufferQueue.queueGet();
-		while (element == null || !element.isOrange()) {
-			if(element != null) {
-				addToBufferOrange(element);
-			}
-			Thread.yield();
-			element = bufferQueue.queueGet();
-		}
-		return element;
-
-	}
 	public Message extractFromBuffer(boolean isOrange) {
 		if(isOrange) {
 			return extractFromBufferOrange();
@@ -60,4 +47,30 @@ public class LimitedBuffer {
 
 		}
 	}
+	
+	public synchronized Message extractFromBufferOrange(){
+		Message element = bufferQueue.peek();
+		if (element == null || !element.isOrange()) {
+			return null;
+		}
+		element = bufferQueue.queueGet();
+		notifyAll();
+		return element;
+
+	}
+	public synchronized Message extractFromBufferNoOrange(){
+		Message element = bufferQueue.peek();
+		while (element == null || element.isOrange()){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			element = bufferQueue.peek();
+		}
+		notifyAll();
+		return bufferQueue.queueGet();
+	}
+	
 }
