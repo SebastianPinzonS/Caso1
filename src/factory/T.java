@@ -146,10 +146,9 @@ public class T extends Thread {
 	    finalBuffer = new UnlimitedBuffer();
 	    
 	    barrier = new CyclicBarrier((3*procesos)+1, ()->System.out.println("El programa termino"));
-	    int bInt = rand.nextInt(procesos);
-	    
-	    for(int threadNum = 0; threadNum < procesos; threadNum++) {
-	    	for(int stage = 1 ; stage < 4; stage++ ) {
+	    for(int stage = 1 ; stage < 4; stage++ ) {
+		    int bInt = rand.nextInt(procesos);
+	    	for(int threadNum = 0; threadNum < procesos; threadNum++) {
 	    		T t = new T(false, threadNum==bInt, stage);
 	    		t.start();
 	    		
